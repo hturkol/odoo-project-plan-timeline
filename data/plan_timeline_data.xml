@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Her kurulum/güncellemede görünümü standart görev eylemlerine ekle -->
+    <function model="project.task" name="plan_timeline_register_view_modes"/>
+</odoo>

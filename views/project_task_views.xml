@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Görev formu: Plan Takibi sekmesi -->
+    <record id="view_task_form_plan_timeline" model="ir.ui.view">
+        <field name="name">project.task.form.plan.timeline</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Plan Takibi" name="schedule_tracking">
+                    <group>
+                        <group string="Plan">
+                            <field name="schedule_date_start"/>
+                            <field name="schedule_date_end"/>
+                            <field name="schedule_planned_days"/>
+                        </group>
+                        <group string="Gerçekleşen">
+                            <field name="schedule_actual_start"/>
+                            <field name="schedule_date_done"/>
+                            <field name="schedule_actual_days"/>
+                        </group>
+                        <group string="Durum">
+                            <field name="schedule_status" widget="badge"
+                                   decoration-success="schedule_status == 'done_on_time'"
+                                   decoration-warning="schedule_status == 'done_late'"
+                                   decoration-danger="schedule_status == 'overdue'"
+                                   decoration-info="schedule_status == 'in_progress'"/>
+                            <field name="schedule_delay_days"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Görev listesi: isteğe bağlı plan sütunları -->
+    <record id="view_task_list_plan_timeline" model="ir.ui.view">
+        <field name="name">project.task.list.plan.timeline</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="schedule_date_start" optional="show"/>
+                <field name="schedule_date_end" optional="show"/>
+                <field name="schedule_date_done" optional="show"/>
+                <field name="schedule_planned_days" optional="hide"/>
+                <field name="schedule_actual_days" optional="hide"/>
+                <field name="schedule_status" widget="badge" optional="show"
+                       decoration-success="schedule_status == 'done_on_time'"
+                       decoration-warning="schedule_status == 'done_late'"
+                       decoration-danger="schedule_status == 'overdue'"
+                       decoration-info="schedule_status == 'in_progress'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Arama: plan filtreleri -->
+    <record id="view_task_search_plan_timeline" model="ir.ui.view">
+        <field name="name">project.task.search.plan.timeline</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Planlı Görevler" name="schedule_planned"
+                        domain="[('schedule_date_start', '!=', False), ('schedule_date_end', '!=', False)]"/>
+                <filter string="Plandan Gecikenler" name="schedule_overdue"
+                        domain="[('schedule_date_done', '=', False), ('schedule_date_end', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Plan: Tamamlanan" name="schedule_done"
+                        domain="[('schedule_date_done', '!=', False)]"/>
+                <filter string="Plan: Açık" name="schedule_open"
+                        domain="[('schedule_date_done', '=', False)]"/>
+                <separator/>
+                <filter string="Planlanan Başlangıç" name="schedule_date_start_filter" date="schedule_date_start"/>
+                <filter string="Planlanan Bitiş" name="schedule_date_end_filter" date="schedule_date_end"/>
+                <filter string="Tamamlanma Tarihi" name="schedule_date_done_filter" date="schedule_date_done"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

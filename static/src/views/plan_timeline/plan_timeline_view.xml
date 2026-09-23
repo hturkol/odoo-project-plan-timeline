@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="project_plan_timeline.PlanTimelineView">
+        <Layout display="props.display" className="'o_plan_timeline_view'">
+            <t t-set-slot="layout-actions">
+                <SearchBar toggler="searchBarToggler"/>
+            </t>
+            <t t-set-slot="control-panel-navigation-additional">
+                <t t-component="searchBarToggler.component" t-props="searchBarToggler.props"/>
+            </t>
+
+            <t t-if="state.loaded">
+                <t t-set="tl" t-value="getTimeline()"/>
+                <div class="o_pt_tl d-flex flex-column h-100">
+
+                    <!-- Özet göstergeler -->
+                    <div class="o_pt_tl_kpis d-flex flex-wrap gap-2 p-3 pb-2">
+                        <div class="o_pt_kpi">
+                            <div class="o_pt_kpi_value" t-esc="tl.summary.total"/>
+                            <div class="o_pt_kpi_label">Planlı Görev</div>
+                        </div>
+                        <div class="o_pt_kpi o_pt_kpi_success">
+                            <div class="o_pt_kpi_value" t-esc="tl.summary.done_on_time"/>
+                            <div class="o_pt_kpi_label">Zamanında Tamamlanan</div>
+                        </div>
+                        <div class="o_pt_kpi o_pt_kpi_warning">
+                            <div class="o_pt_kpi_value" t-esc="tl.summary.done_late"/>
+                            <div class="o_pt_kpi_label">Geç Tamamlanan</div>
+                        </div>
+                        <div class="o_pt_kpi o_pt_kpi_info">
+                            <div class="o_pt_kpi_value" t-esc="tl.summary.in_progress"/>
+                            <div class="o_pt_kpi_label">Devam Eden</div>
+                        </div>
+                        <div class="o_pt_kpi o_pt_kpi_danger">
+                            <div class="o_pt_kpi_value" t-esc="tl.summary.overdue"/>
+                            <div class="o_pt_kpi_label">Gecikmede</div>
+                        </div>
+                        <div class="o_pt_kpi">
+                            <div class="o_pt_kpi_value" t-esc="tl.summary.not_started"/>
+                            <div class="o_pt_kpi_label">Başlamadı</div>
+                        </div>
+                        <div class="o_pt_kpi">
+                            <div class="o_pt_kpi_value">
+                                <t t-esc="tl.summary.plannedDays"/> / <t t-esc="tl.summary.actualDays"/>
+                            </div>
+                            <div class="o_pt_kpi_label">Planlanan / Gerçekleşen Gün</div>
+                        </div>
+                        <div class="o_pt_kpi" t-if="tl.summary.onTimeRate !== null">
+                            <div class="o_pt_kpi_value">%<t t-esc="tl.summary.onTimeRate"/></div>
+                            <div class="o_pt_kpi_label">
+                                Zamanında Bitirme · ort. sapma <t t-esc="tl.summary.avgDelay"/> gün
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Araç çubuğu ve lejant -->
+                    <div class="o_pt_tl_toolbar d-flex flex-wrap align-items-center gap-3 px-3 pb-2">
+                        <div class="btn-group" role="group">
+                            <t t-foreach="scales" t-as="scale" t-key="scale.key">
+                                <button type="button"
+                                        t-attf-class="btn btn-sm {{ state.scale === scale.key ? 'btn-primary' : 'btn-secondary' }}"
+                                        t-on-click="() => this.setScale(scale.key)"
+                                        t-esc="scale.label"/>
+                            </t>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" id="o_pt_tl_group"
+                                   t-att-checked="state.groupByProject" t-on-change="onToggleGroup"/>
+                            <label class="form-check-label" for="o_pt_tl_group">Projeye göre grupla</label>
+                        </div>
+                        <div class="form-check form-switch mb-0" t-if="tl.undatedCount">
+                            <input class="form-check-input" type="checkbox" id="o_pt_tl_undated"
+                                   t-att-checked="state.showUndated" t-on-change="onToggleUndated"/>
+                            <label class="form-check-label" for="o_pt_tl_undated">
+                                Tarihsiz görevleri göster (<t t-esc="tl.undatedCount"/>)
+                            </label>
+                        </div>
+                        <div class="o_pt_tl_legend d-flex flex-wrap align-items-center gap-3 ms-auto small text-muted">
+                            <span><i class="o_pt_legend o_pt_bar_planned"/>Planlanan</span>
+                            <span><i class="o_pt_legend o_pt_bar_progress"/>Gerçekleşen (devam)</span>
+                            <span><i class="o_pt_legend o_pt_bar_done"/>Gerçekleşen (bitti)</span>
+                            <span><i class="o_pt_legend o_pt_bar_over"/>Plan aşımı</span>
+                            <span><i class="o_pt_legend o_pt_legend_today"/>Bugün</span>
+                        </div>
+                    </div>
+
+                    <div t-if="state.total > records.length" class="alert alert-warning mx-3 py-2 small">
+                        Toplam <t t-esc="state.total"/> görevden ilk <t t-esc="records.length"/> tanesi gösteriliyor. Filtreleri daraltın.
+                    </div>
+
+                    <!-- Tablo + çizelge -->
+                    <div t-if="tl.rowCount" class="o_pt_tl_scroll flex-grow-1 mx-3 mb-3">
+                        <div class="o_pt_tl_table" t-att-style="tl.tableStyle">
+                            <div class="o_pt_tl_row o_pt_tl_head">
+                                <div class="o_pt_tl_cell o_pt_tl_name">Görev</div>
+                                <div class="o_pt_tl_cell">Planlanan</div>
+                                <div class="o_pt_tl_cell">Gerçekleşen</div>
+                                <div class="o_pt_tl_cell">Durum</div>
+                                <div class="o_pt_tl_chart o_pt_tl_axis">
+                                    <t t-foreach="tl.ticks" t-as="tick" t-key="tick.key">
+                                        <span t-attf-class="o_pt_tl_tick {{ tick.major ? 'o_pt_tl_tick_major' : '' }}"
+                                              t-att-style="tick.style" t-esc="tick.label"/>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <t t-foreach="tl.groups" t-as="group" t-key="group.key">
+                                <div t-if="group.name" class="o_pt_tl_row o_pt_tl_group">
+                                    <div class="o_pt_tl_cell o_pt_tl_name fw-bold text-truncate" t-att-title="group.name">
+                                        <i class="fa fa-folder-open-o me-1"/><t t-esc="group.name"/>
+                                    </div>
+                                    <div class="o_pt_tl_cell o_pt_tl_group_info small text-muted" t-esc="group.info"/>
+                                    <div class="o_pt_tl_chart">
+                                        <div t-if="tl.todayStyle" class="o_pt_tl_today" t-att-style="tl.todayStyle"/>
+                                        <div t-if="group.span" class="o_pt_bar o_pt_bar_group"
+                                             t-att-style="group.span.style" t-att-title="group.span.title"/>
+                                    </div>
+                                </div>
+
+                                <t t-foreach="group.rows" t-as="row" t-key="row.id">
+                                    <div class="o_pt_tl_row o_pt_tl_task" t-on-click="() => this.openTask(row.id)">
+                                        <div class="o_pt_tl_cell o_pt_tl_name">
+                                            <div class="fw-semibold text-truncate" t-att-title="row.name" t-esc="row.name"/>
+                                            <div class="small text-muted text-truncate">
+                                                <t t-esc="row.stageName"/>
+                                                <t t-if="row.users"> · <t t-esc="row.users"/></t>
+                                            </div>
+                                        </div>
+                                        <div class="o_pt_tl_cell small">
+                                            <t t-if="row.hasPlan">
+                                                <div t-esc="row.plannedText"/>
+                                                <div class="text-muted"><t t-esc="row.plannedDays"/> gün</div>
+                                            </t>
+                                            <span t-else="" class="text-muted">—</span>
+                                        </div>
+                                        <div class="o_pt_tl_cell small">
+                                            <t t-if="row.actualText">
+                                                <div t-esc="row.actualText"/>
+                                                <div class="text-muted"><t t-esc="row.actualDays"/> gün</div>
+                                            </t>
+                                            <span t-else="" class="text-muted">—</span>
+                                        </div>
+                                        <div class="o_pt_tl_cell">
+                                            <span t-attf-class="badge rounded-pill {{ row.badgeClass }}" t-esc="row.statusLabel"/>
+                                            <div t-if="row.delay.text" t-attf-class="small mt-1 {{ row.delay.cls }}" t-esc="row.delay.text"/>
+                                        </div>
+                                        <div class="o_pt_tl_chart">
+                                            <t t-foreach="tl.ticks" t-as="tick" t-key="tick.key">
+                                                <div t-attf-class="o_pt_tl_gridline {{ tick.major ? 'o_pt_tl_gridline_major' : '' }}"
+                                                     t-att-style="tick.style"/>
+                                            </t>
+                                            <div t-if="tl.todayStyle" class="o_pt_tl_today" t-att-style="tl.todayStyle"/>
+                                            <div t-if="row.planned" class="o_pt_bar o_pt_bar_planned"
+                                                 t-att-style="row.planned.style" t-att-title="row.planned.title"/>
+                                            <t t-foreach="row.actual" t-as="seg" t-key="seg_index">
+                                                <div t-attf-class="o_pt_bar o_pt_bar_actual {{ seg.cls }}"
+                                                     t-att-style="seg.style" t-att-title="seg.title"/>
+                                            </t>
+                                            <div t-if="!row.hasPlan" class="o_pt_tl_noplan small text-muted">
+                                                Plan tarihi girilmemiş
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+
+                    <div t-else="" class="o_view_nocontent">
+                        <div class="o_nocontent_help">
+                            <p class="o_view_nocontent_empty_folder">Gösterilecek planlı görev yok</p>
+                            <p>Görevlerin "Plan Takibi" sekmesinden planlanan başlangıç ve bitiş tarihlerini girin.</p>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </Layout>
+    </t>
+
+</templates>

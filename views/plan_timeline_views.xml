@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_plan_timeline" model="ir.ui.view">
+        <field name="name">project.task.plan.timeline</field>
+        <field name="model">project.task</field>
+        <field name="type">plan_timeline</field>
+        <field name="arch" type="xml">
+            <plan_timeline/>
+        </field>
+    </record>
+
+    <record id="action_plan_timeline" model="ir.actions.act_window">
+        <field name="name">Zaman Çizelgesi</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">plan_timeline,list,form</field>
+        <field name="search_view_id" ref="project.view_task_search_form"/>
+        <field name="context">{'search_default_schedule_planned': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'plan_timeline', 'view_id': ref('view_task_plan_timeline')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('project.view_task_tree2')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('project.view_task_form2')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Planlı görev bulunamadı</p>
+            <p>Görevlerin "Plan Takibi" sekmesinden planlanan başlangıç ve bitiş tarihlerini girin.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_plan_timeline"
+              name="Zaman Çizelgesi"
+              parent="project.menu_main_pm"
+              action="action_plan_timeline"
+              sequence="4"/>
+</odoo>

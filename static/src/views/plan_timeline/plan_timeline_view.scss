@@ -1,0 +1,235 @@
+$pt-planned: #adb5bd;
+$pt-progress: #3b82f6;
+$pt-done: #16a34a;
+$pt-over: #dc2626;
+$pt-today: #e11d48;
+
+.o_pt_tl {
+    min-height: 0;
+}
+
+// ---------------------------------------------------------------------
+// Özet göstergeler
+// ---------------------------------------------------------------------
+.o_pt_kpi {
+    min-width: 120px;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-left-width: 4px;
+    border-radius: 0.375rem;
+
+    .o_pt_kpi_value {
+        font-size: 1.35rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    .o_pt_kpi_label {
+        font-size: 0.78rem;
+        opacity: 0.7;
+    }
+    &.o_pt_kpi_success { border-left-color: $pt-done; }
+    &.o_pt_kpi_warning { border-left-color: #f59e0b; }
+    &.o_pt_kpi_info { border-left-color: $pt-progress; }
+    &.o_pt_kpi_danger { border-left-color: $pt-over; }
+}
+
+// ---------------------------------------------------------------------
+// Lejant
+// ---------------------------------------------------------------------
+.o_pt_legend {
+    display: inline-block;
+    width: 18px;
+    height: 8px;
+    margin-right: 5px;
+    border-radius: 2px;
+    vertical-align: middle;
+
+    &.o_pt_legend_today {
+        width: 2px;
+        height: 12px;
+        background: $pt-today;
+    }
+}
+
+// ---------------------------------------------------------------------
+// Tablo
+// ---------------------------------------------------------------------
+.o_pt_tl_scroll {
+    overflow: auto;
+    min-height: 0;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.375rem;
+}
+
+.o_pt_tl_table {
+    display: grid;
+    grid-template-columns: 280px 150px 150px 180px var(--pt-tl-chart, minmax(480px, 1fr));
+    min-width: min-content;
+}
+
+.o_pt_tl_row {
+    display: contents;
+
+    > * {
+        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+        background-color: var(--bs-body-bg, #fff);
+    }
+}
+
+.o_pt_tl_cell {
+    padding: 6px 10px;
+    min-width: 0;
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.o_pt_tl_name {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+.o_pt_tl_head > * {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background-color: var(--bs-tertiary-bg, #f8f9fa);
+}
+.o_pt_tl_head > .o_pt_tl_name {
+    z-index: 4;
+}
+
+.o_pt_tl_group > * {
+    background-color: var(--bs-secondary-bg, #e9ecef);
+}
+.o_pt_tl_group_info {
+    grid-column: 2 / 5;
+    display: flex;
+    align-items: center;
+}
+
+.o_pt_tl_task {
+    cursor: pointer;
+
+    &:hover > * {
+        background-color: var(--bs-tertiary-bg, #f3f4f6);
+    }
+}
+
+// ---------------------------------------------------------------------
+// Çizelge alanı
+// ---------------------------------------------------------------------
+.o_pt_tl_chart {
+    position: relative;
+    min-height: 52px;
+    overflow: hidden;
+}
+
+.o_pt_tl_group .o_pt_tl_chart {
+    min-height: 34px;
+}
+
+.o_pt_tl_axis {
+    min-height: 34px;
+}
+
+.o_pt_tl_tick {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    padding: 8px 0 0 4px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    white-space: nowrap;
+    border-left: 1px solid var(--bs-border-color, #dee2e6);
+    opacity: 0.8;
+
+    &.o_pt_tl_tick_major {
+        font-weight: 600;
+        opacity: 1;
+    }
+}
+
+.o_pt_tl_gridline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed rgba(128, 128, 128, 0.18);
+
+    &.o_pt_tl_gridline_major {
+        border-left: 1px solid rgba(128, 128, 128, 0.3);
+    }
+}
+
+.o_pt_tl_today {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    border-left: 2px solid $pt-today;
+    opacity: 0.7;
+}
+
+.o_pt_tl_noplan {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-style: italic;
+}
+
+// ---------------------------------------------------------------------
+// Barlar
+// ---------------------------------------------------------------------
+.o_pt_bar {
+    position: absolute;
+    border-radius: 3px;
+    z-index: 1;
+}
+
+.o_pt_bar_planned {
+    top: 10px;
+    height: 12px;
+    background: rgba($pt-planned, 0.45);
+    border: 1px solid $pt-planned;
+}
+
+.o_pt_bar_actual {
+    top: 27px;
+    height: 14px;
+}
+
+.o_pt_bar_group {
+    top: 11px;
+    height: 12px;
+    background: rgba($pt-progress, 0.2);
+    border: 1px solid rgba($pt-progress, 0.6);
+}
+
+.o_pt_bar_progress {
+    background: $pt-progress;
+}
+
+.o_pt_bar_done {
+    background: $pt-done;
+}
+
+.o_pt_bar_over {
+    background: $pt-over;
+}
+
+.o_pt_bar_striped {
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.35) 0,
+        rgba(255, 255, 255, 0.35) 4px,
+        transparent 4px,
+        transparent 8px
+    );
+}
+
+.o_pt_legend.o_pt_bar_planned {
+    background: rgba($pt-planned, 0.45);
+    border: 1px solid $pt-planned;
+}
