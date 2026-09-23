@@ -25,5 +25,5 @@ Proje görevlerini plana göre takip etmek için (implementasyon, kurulum, danı
     },
     "uninstall_hook": "uninstall_hook",
     "installable": True,
-    "application": False,
+    "application": True,
 }

@@ -22,7 +22,7 @@ ERP implementasyonu, kurulum, danışmanlık, yazılım geliştirme gibi tarih p
   - Satıra tıklayınca görev formu açılır; arama çubuğundaki tüm filtreler çalışır
 - Liste görünümüne isteğe bağlı plan sütunları, arama görünümüne plan filtreleri.
 
-![Zaman Çizelgesi](static/description/zaman_cizelgesi.png)
+![Zaman Çizelgesi](project_plan_timeline/static/description/zaman_cizelgesi.png)
 
 ## Erişim
 
@@ -31,8 +31,26 @@ ERP implementasyonu, kurulum, danışmanlık, yazılım geliştirme gibi tarih p
 
 ## Kurulum
 
-1. `project_plan_timeline` klasörünü addons yolunuza kopyalayın.
-2. Uygulamalar → Uygulama Listesini Güncelle → "Plan / Gerçekleşen Takibi" → Kur.
+Depodaki modül klasörü `project_plan_timeline/`dır (Odoo, modül klasörünün teknik adla aynı olmasını ister).
+
+**Seçenek A – depoyu addons yolu olarak ekleyin**
+
+```bash
+git clone https://github.com/hturkol/odoo-project-plan-timeline.git /opt/odoo/custom/odoo-project-plan-timeline
+```
+
+`odoo.conf` içinde `addons_path` sonuna depo klasörünü ekleyin (içindeki modül klasörünü değil):
+
+```ini
+addons_path = ...,/opt/odoo/custom/odoo-project-plan-timeline
+```
+
+**Seçenek B – sadece modül klasörünü kopyalayın**
+
+Depodaki `project_plan_timeline/` klasörünü mevcut bir addons klasörüne kopyalayın.
+
+Ardından Odoo'yu yeniden başlatın, geliştirici modunu açın ve
+Uygulamalar → **Uygulama Listesini Güncelle** → "Plan / Gerçekleşen Takibi" → **Kur**.
 
 > Not: `project` / `project_enterprise` modülleri güncellendiğinde standart görev eylemlerinin görünüm listesi
 > sıfırlanabilir. Bu durumda bu modülü de güncelleyin (görünüm tekrar eklenir).
